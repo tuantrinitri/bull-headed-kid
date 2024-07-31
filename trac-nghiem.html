@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Quiz App</h1>
+        <div id="quiz-container"></div>
+        <button id="submit">Submit</button>
+        <div id="result"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('questions.json')
+                .then(response => response.json())
+                .then(data => {
+                    const quizContainer = document.getElementById('quiz-container');
+                    data.forEach((question, index) => {
+                        const questionElement = document.createElement('div');
+                        questionElement.classList.add('question');
+                        questionElement.innerHTML = `
+                    <p>${question.question}</p>
+                    ${question.options.map((option, i) => `
+                        <label>
+                            <input type="radio" name="question${index}" value="${i}">
+                            ${option}
+                        </label>
+                    `).join('')}
+                `;
+                        quizContainer.appendChild(questionElement);
+                    });
+                });
+
+            document.getElementById('submit').addEventListener('click', () => {
+                fetch('questions.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        let score = 0;
+                        data.forEach((question, index) => {
+                            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                            if (selectedOption && parseInt(selectedOption.value) === question.correct) {
+                                score++;
+                            }
+                        });
+                        document.getElementById('result').textContent = `You scored ${score} out of ${data.length}`;
+                    });
+            });
+        });
+
+    </script>
+</body>
+
+</html>
